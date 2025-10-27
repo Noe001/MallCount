@@ -24,7 +24,7 @@ export default function Landing() {
           訪問回数を記録して、お気に入りのモールを見つけましょう。
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+        <div className="flex flex-col gap-4 items-center pt-8">
           <Button
             size="lg"
             onClick={handleLogin}
@@ -32,8 +32,11 @@ export default function Landing() {
             data-testid="button-login"
           >
             <LogIn className="w-5 h-5 mr-2" />
-            ログイン
+            ログイン / 新規登録
           </Button>
+          <p className="text-sm text-muted-foreground">
+            アカウントをお持ちでない方も、上記ボタンから新規登録できます
+          </p>
         </div>
 
         <div className="pt-12 space-y-4">
