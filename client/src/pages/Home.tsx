@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useLocation } from "wouter";
 import AppHeader from "@/components/AppHeader";
 import StatsDashboard from "@/components/StatsDashboard";
 import RegionTabs from "@/components/RegionTabs";
@@ -26,6 +27,8 @@ const MOCK_MALLS = [
 ];
 
 export default function Home() {
+  const [, setLocation] = useLocation();
+  
   // TODO: Remove mock authentication - replace with real auth
   const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -63,6 +66,20 @@ export default function Home() {
       ...prev,
       [mallId]: dateStr
     }));
+  };
+
+  const handleDecrement = (mallId: number) => {
+    console.log(`Decrementing visit count for mall ${mallId}`);
+    setVisitCounts(prev => {
+      const currentCount = prev[mallId] || 0;
+      if (currentCount > 0) {
+        return {
+          ...prev,
+          [mallId]: currentCount - 1
+        };
+      }
+      return prev;
+    });
   };
 
   const filteredAndSortedMalls = useMemo(() => {
@@ -138,8 +155,7 @@ export default function Home() {
         onSearchChange={setSearchQuery}
         userName="山田太郎"
         userEmail="yamada@example.com"
-        onProfile={() => console.log('Profile clicked')}
-        onSettings={() => console.log('Settings clicked')}
+        onSettings={() => setLocation('/settings')}
         onLogout={() => {
           console.log('Logout clicked');
           setIsAuthenticated(false);
@@ -182,6 +198,7 @@ export default function Home() {
                   visitCount={visitCounts[mall.id] || 0}
                   lastVisit={lastVisits[mall.id]}
                   onIncrement={() => handleIncrement(mall.id)}
+                  onDecrement={() => handleDecrement(mall.id)}
                 />
               ))}
             </div>

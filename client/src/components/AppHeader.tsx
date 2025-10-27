@@ -7,7 +7,6 @@ interface AppHeaderProps {
   onSearchChange: (value: string) => void;
   userName: string;
   userEmail?: string;
-  onProfile?: () => void;
   onSettings?: () => void;
   onLogout?: () => void;
 }
@@ -17,7 +16,6 @@ export default function AppHeader({
   onSearchChange,
   userName,
   userEmail,
-  onProfile,
   onSettings,
   onLogout,
 }: AppHeaderProps) {
@@ -44,7 +42,6 @@ export default function AppHeader({
           <UserMenu
             userName={userName}
             userEmail={userEmail}
-            onProfile={onProfile}
             onSettings={onSettings}
             onLogout={onLogout}
           />

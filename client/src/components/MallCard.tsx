@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, MapPin, Calendar } from "lucide-react";
+import { Plus, Minus, MapPin, Calendar } from "lucide-react";
 
 interface MallCardProps {
   id: number;
@@ -12,6 +12,7 @@ interface MallCardProps {
   visitCount: number;
   lastVisit?: string;
   onIncrement: () => void;
+  onDecrement: () => void;
 }
 
 export default function MallCard({
@@ -22,6 +23,7 @@ export default function MallCard({
   visitCount,
   lastVisit,
   onIncrement,
+  onDecrement,
 }: MallCardProps) {
   return (
     <Card className="p-4 hover:shadow-lg transition-shadow duration-200" data-testid={`card-mall-${name}`}>
@@ -51,14 +53,25 @@ export default function MallCard({
           <div className="text-xs text-muted-foreground mt-1">訪問回数</div>
         </div>
         
-        <Button
-          onClick={onIncrement}
-          className="w-full py-3"
-          data-testid={`button-increment-${name}`}
-        >
-          <Plus className="w-5 h-5 mr-2" />
-          訪問を記録
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={onIncrement}
+            className="flex-1 py-3"
+            data-testid={`button-increment-${name}`}
+          >
+            <Plus className="w-5 h-5 mr-2" />
+            追加
+          </Button>
+          <Button
+            onClick={onDecrement}
+            variant="outline"
+            className="py-3 px-3"
+            disabled={visitCount === 0}
+            data-testid={`button-decrement-${name}`}
+          >
+            <Minus className="w-5 h-5" />
+          </Button>
+        </div>
         
         {lastVisit && (
           <div className="text-center text-xs text-muted-foreground" data-testid={`text-last-visit-${name}`}>

@@ -7,17 +7,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, Settings, LogOut } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 
 interface UserMenuProps {
   userName: string;
   userEmail?: string;
-  onProfile?: () => void;
   onSettings?: () => void;
   onLogout?: () => void;
 }
 
-export default function UserMenu({ userName, userEmail, onProfile, onSettings, onLogout }: UserMenuProps) {
+export default function UserMenu({ userName, userEmail, onSettings, onLogout }: UserMenuProps) {
   const initials = userName
     .split(' ')
     .map((n) => n[0])
@@ -49,10 +48,6 @@ export default function UserMenu({ userName, userEmail, onProfile, onSettings, o
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={onProfile} data-testid="menu-item-profile">
-          <User className="mr-2 h-4 w-4" />
-          <span>プロフィール</span>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={onSettings} data-testid="menu-item-settings">
           <Settings className="mr-2 h-4 w-4" />
           <span>設定</span>

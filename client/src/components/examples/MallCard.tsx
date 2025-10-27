@@ -12,6 +12,7 @@ export default function MallCardExample() {
         visitCount={5}
         lastVisit="2024年10月15日"
         onIncrement={() => console.log('Increment clicked')}
+        onDecrement={() => console.log('Decrement clicked')}
       />
     </div>
   );
