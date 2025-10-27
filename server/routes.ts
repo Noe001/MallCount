@@ -1,20 +1,103 @@
-// Based on javascript_log_in_with_replit blueprint
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated, hashPassword } from "./auth";
 import { z } from "zod";
+import passport from "passport";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware setup
   await setupAuth(app);
 
   // Auth routes
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const schema = z.object({
+        email: z.string().email(),
+        password: z.string().min(8),
+        firstName: z.string().optional(),
+        lastName: z.string().optional(),
+      });
+      
+      const { email, password, firstName, lastName } = schema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+      
+      // Hash password
+      const passwordHash = await hashPassword(password);
+      
+      // Create user
+      const user = await storage.upsertUser({
+        email,
+        passwordHash,
+        firstName,
+        lastName,
+      });
+      
+      // Log in the user
+      req.login(user, (err) => {
+        if (err) {
+          console.error("Error logging in after registration:", err);
+          return res.status(500).json({ message: "Registration successful but login failed" });
+        }
+        
+        const { passwordHash: _, ...userWithoutPassword } = user;
+        res.status(201).json(userWithoutPassword);
+      });
+    } catch (error) {
+      console.error("Error registering user:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid request data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to register user" });
+    }
+  });
+
+  app.post('/api/auth/login', (req, res, next) => {
+    passport.authenticate('local', (err: any, user: any, info: any) => {
+      if (err) {
+        console.error("Error during login:", err);
+        return res.status(500).json({ message: "Login failed" });
+      }
+      
+      if (!user) {
+        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+      }
+      
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Error establishing session:", loginErr);
+          return res.status(500).json({ message: "Login failed" });
+        }
+        
+        res.json(user);
+      });
+    })(req, res, next);
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        console.error("Error during logout:", err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+      res.json({ message: "Logged out successfully" });
+    });
+  });
+
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const user = await storage.getUser(userId);
-      res.json(user);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -49,7 +132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Visit routes
   app.get("/api/visits", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const visits = await storage.getUserVisits(userId);
       res.json(visits);
     } catch (error) {
@@ -60,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/visits/increment", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       console.log("[INCREMENT] User ID:", userId, "Body:", req.body);
       const schema = z.object({
         mallId: z.number().int().positive(),
@@ -83,7 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/visits/decrement", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const schema = z.object({
         mallId: z.number().int().positive(),
       });
@@ -107,7 +190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/visits/reset", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       await storage.resetAllVisits(userId);
       res.json({ message: "All visits reset successfully" });
     } catch (error) {

@@ -14,7 +14,7 @@ export default function Home() {
   const [, setLocation] = useLocation();
   
   // Use real authentication
-  const { user, isLoading: isLoadingAuth, isAuthenticated } = useAuth();
+  const { user, isLoading: isLoadingAuth, isAuthenticated, logout } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,7 +42,7 @@ export default function Home() {
   };
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    logout();
   };
 
   const filteredAndSortedMalls = useMemo(() => {
