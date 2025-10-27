@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Minus, MapPin, Calendar } from "lucide-react";
 
 interface MallCardProps {
   id: number;
@@ -37,12 +36,10 @@ export default function MallCard({
       </div>
       
       <div className="space-y-2 mb-4">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MapPin className="w-4 h-4 shrink-0" />
+        <div className="text-sm text-muted-foreground">
           <span className="line-clamp-1" data-testid={`text-address-${name}`}>{address}</span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Calendar className="w-4 h-4 shrink-0" />
+        <div className="text-xs text-muted-foreground">
           <span data-testid={`text-opening-date-${name}`}>開業: {openingDate}</span>
         </div>
       </div>
@@ -59,17 +56,16 @@ export default function MallCard({
             className="flex-1 py-3"
             data-testid={`button-increment-${name}`}
           >
-            <Plus className="w-5 h-5 mr-2" />
             追加
           </Button>
           <Button
             onClick={onDecrement}
             variant="outline"
-            className="py-3 px-3"
+            className="py-3 px-4"
             disabled={visitCount === 0}
             data-testid={`button-decrement-${name}`}
           >
-            <Minus className="w-5 h-5" />
+            削除
           </Button>
         </div>
         

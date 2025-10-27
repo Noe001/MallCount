@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Store, LogIn } from "lucide-react";
 
 export default function Landing() {
   const handleLogin = () => {
@@ -9,12 +8,6 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted flex flex-col items-center justify-center px-4">
       <div className="max-w-2xl mx-auto text-center space-y-8">
-        <div className="flex justify-center mb-8">
-          <div className="bg-primary/10 p-6 rounded-full">
-            <Store className="w-16 h-16 text-primary" />
-          </div>
-        </div>
-        
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
           イオンモール訪問カウンター
         </h1>
@@ -31,7 +24,6 @@ export default function Landing() {
             className="text-lg px-8"
             data-testid="button-login"
           >
-            <LogIn className="w-5 h-5 mr-2" />
             ログイン / 新規登録
           </Button>
           <p className="text-sm text-muted-foreground">
