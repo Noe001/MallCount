@@ -61,16 +61,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/visits/increment", isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
+      console.log("[INCREMENT] User ID:", userId, "Body:", req.body);
       const schema = z.object({
         mallId: z.number().int().positive(),
       });
       const { mallId } = schema.parse(req.body);
+      console.log("[INCREMENT] Parsed mallId:", mallId);
       
       const visit = await storage.incrementVisit(userId, mallId);
+      console.log("[INCREMENT] Success - visit:", visit);
       res.json(visit);
     } catch (error) {
-      console.error("Error incrementing visit:", error);
+      console.error("[INCREMENT] Error incrementing visit:", error);
       if (error instanceof z.ZodError) {
+        console.error("[INCREMENT] Zod validation error:", error.errors);
         return res.status(400).json({ message: "Invalid request data", errors: error.errors });
       }
       res.status(500).json({ message: "Failed to increment visit" });

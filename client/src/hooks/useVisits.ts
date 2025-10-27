@@ -13,7 +13,7 @@ export function useVisits() {
 
   const incrementMutation = useMutation({
     mutationFn: async (mallId: number) => {
-      return await apiRequest("/api/visits/increment", "POST", { mallId });
+      return await apiRequest("POST", "/api/visits/increment", { mallId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/visits"] });
@@ -40,7 +40,7 @@ export function useVisits() {
 
   const decrementMutation = useMutation({
     mutationFn: async (mallId: number) => {
-      return await apiRequest("/api/visits/decrement", "POST", { mallId });
+      return await apiRequest("POST", "/api/visits/decrement", { mallId });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/visits"] });
@@ -67,7 +67,7 @@ export function useVisits() {
 
   const resetMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/visits/reset", "DELETE");
+      return await apiRequest("DELETE", "/api/visits/reset");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/visits"] });
