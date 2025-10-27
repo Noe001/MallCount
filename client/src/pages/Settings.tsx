@@ -6,6 +6,7 @@ import { useTheme } from "@/components/ThemeProvider";
 import { ArrowLeft, Moon, Sun, Monitor, Trash2, Bell, Database } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
+import { useVisits } from "@/hooks/useVisits";
 import {
   Select,
   SelectContent,
@@ -29,11 +30,10 @@ export default function Settings() {
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
+  const { resetAllVisits, isResetting } = useVisits();
 
   const handleResetData = () => {
-    console.log("Resetting all data...");
-    localStorage.clear();
-    window.location.reload();
+    resetAllVisits();
   };
 
   const getThemeIcon = (currentTheme: string) => {
@@ -182,9 +182,14 @@ export default function Settings() {
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full" data-testid="button-reset-data">
+                  <Button 
+                    variant="destructive" 
+                    className="w-full" 
+                    data-testid="button-reset-data"
+                    disabled={isResetting}
+                  >
                     <Trash2 className="w-4 h-4 mr-2" />
-                    すべてのデータをリセット
+                    {isResetting ? "リセット中..." : "すべてのデータをリセット"}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -203,8 +208,9 @@ export default function Settings() {
                       onClick={handleResetData}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       data-testid="button-confirm-reset"
+                      disabled={isResetting}
                     >
-                      リセットする
+                      {isResetting ? "リセット中..." : "リセットする"}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
