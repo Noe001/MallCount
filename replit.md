@@ -55,7 +55,8 @@ Preferred communication style: Simple, everyday language.
 - RESTful API routes prefixed with `/api`
 - Routes registered through `registerRoutes` function in `server/routes.ts`
 - Storage interface abstraction (`IStorage`) for data operations
-- Currently using in-memory storage (`MemStorage`) - designed to be swapped with database implementation
+- PostgreSQL database implementation (DbStorage) in production
+- Protected routes require authentication via Replit Auth middleware
 
 **Request/Response Handling**
 - JSON body parsing with raw body preservation for webhook support
@@ -73,8 +74,11 @@ Preferred communication style: Simple, everyday language.
 **Schema Definition**
 - Database schema defined in `shared/schema.ts` using Drizzle
 - Zod integration via drizzle-zod for runtime validation
-- Current schema includes basic user table (id, username, password)
-- Schema designed to be extended with mall visit tracking tables
+- Current schema includes:
+  - `sessions` table for Express session storage
+  - `users` table for Replit Auth user data (replitId, email, name, profileImageUrl)
+  - `malls` table for AEON Mall locations (40 real malls across Japan)
+  - `visits` table for user visit tracking (userId, mallId, visitCount, lastVisitedAt)
 
 **Migration Strategy**
 - Drizzle Kit for schema migrations
@@ -89,16 +93,13 @@ Preferred communication style: Simple, everyday language.
 ### Authentication and Authorization
 
 **Current Implementation**
-- Basic user schema with username/password fields
-- No authentication currently implemented in routes
-- AuthModal component exists in frontend for login/signup UI
-- Session management infrastructure exists (connect-pg-simple for PostgreSQL sessions)
-
-**Planned Authentication**
+- Replit Auth integration (OIDC) for user authentication
 - Session-based authentication using Express sessions
 - PostgreSQL session store via connect-pg-simple
-- Password hashing (library included but not yet implemented)
-- Frontend auth state managed through React Query
+- Protected API routes requiring authentication
+- Frontend auth state managed through useAuth hook and React Query
+- Landing page with login button for unauthenticated users
+- Automatic redirect to login page when session expires
 
 ### External Dependencies
 
