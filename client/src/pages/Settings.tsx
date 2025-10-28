@@ -2,11 +2,13 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useTheme } from "@/components/ThemeProvider";
-import { ArrowLeft, Moon, Sun, Monitor, Trash2, Bell, Database } from "lucide-react";
+import { ArrowLeft, Moon, Sun, Monitor, Trash2, Bell, Database, User } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { useVisits } from "@/hooks/useVisits";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Select,
   SelectContent,
@@ -28,12 +30,20 @@ import {
 
 export default function Settings() {
   const { theme, setTheme } = useTheme();
+  const { user, updateUser, isUpdating } = useAuth();
   const [notifications, setNotifications] = useState(true);
   const [autoSync, setAutoSync] = useState(true);
   const { resetAllVisits, isResetting } = useVisits();
+  
+  const [firstName, setFirstName] = useState(user?.firstName || "");
+  const [lastName, setLastName] = useState(user?.lastName || "");
 
   const handleResetData = () => {
     resetAllVisits();
+  };
+
+  const handleUpdateProfile = () => {
+    updateUser({ firstName, lastName });
   };
 
   const getThemeIcon = (currentTheme: string) => {
@@ -64,6 +74,53 @@ export default function Settings() {
 
       <div className="container max-w-2xl px-4 lg:px-8 py-8">
         <div className="space-y-6">
+          <Card className="p-6" data-testid="card-profile">
+            <div className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold mb-1">プロフィール</h2>
+                <p className="text-sm text-muted-foreground">
+                  名前を変更できます
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">姓</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="山田"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    data-testid="input-last-name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">名</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="太郎"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    data-testid="input-first-name"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleUpdateProfile}
+                  disabled={isUpdating}
+                  className="w-full"
+                  data-testid="button-update-profile"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  {isUpdating ? "保存中..." : "プロフィールを更新"}
+                </Button>
+              </div>
+            </div>
+          </Card>
+
           <Card className="p-6" data-testid="card-appearance">
             <div className="space-y-4">
               <div>

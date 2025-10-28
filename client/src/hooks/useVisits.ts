@@ -16,6 +16,13 @@ export function useVisits() {
       return await apiRequest("POST", "/api/visits/increment", { mallId });
     },
     onMutate: async (mallId: number) => {
+      // 保存中トーストを表示
+      toast({
+        title: "保存中...",
+        description: "訪問記録を保存しています",
+        duration: 1000,
+      });
+
       // キャンセル進行中のクエリ
       await queryClient.cancelQueries({ queryKey: ["/api/visits"] });
 
@@ -87,6 +94,13 @@ export function useVisits() {
       return await apiRequest("POST", "/api/visits/decrement", { mallId });
     },
     onMutate: async (mallId: number) => {
+      // 保存中トーストを表示
+      toast({
+        title: "保存中...",
+        description: "訪問記録を保存しています",
+        duration: 1000,
+      });
+
       // キャンセル進行中のクエリ
       await queryClient.cancelQueries({ queryKey: ["/api/visits"] });
 
