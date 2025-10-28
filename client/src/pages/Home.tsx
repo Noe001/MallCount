@@ -167,7 +167,7 @@ export default function Home() {
         thisMonthVisits={thisMonthVisits}
       />
 
-      <div className="container px-4 lg:px-8 pb-12">
+      <div className="container pb-12">
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <RegionTabs

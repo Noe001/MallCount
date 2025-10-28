@@ -60,7 +60,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center gap-4 px-4 lg:px-8">
+        <div className="container flex h-16 items-center gap-4">
           <Link href="/">
             <Button variant="ghost" size="icon" data-testid="button-back">
               <ArrowLeft className="w-5 h-5" />
@@ -72,7 +72,7 @@ export default function Settings() {
         </div>
       </header>
 
-      <div className="container max-w-2xl px-4 lg:px-8 py-8">
+      <div className="container max-w-2xl py-8">
         <div className="space-y-6">
           <Card className="p-6" data-testid="card-profile">
             <div className="space-y-4">

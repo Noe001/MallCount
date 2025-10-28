@@ -15,7 +15,7 @@ export default function StatsDashboard({
 }: StatsDashboardProps) {
   return (
     <div className="py-12" data-testid="section-stats">
-      <div className="container px-4 lg:px-8">
+      <div className="container">
         <h2 className="text-xl font-semibold mb-6" data-testid="text-stats-heading">
           訪問統計
         </h2>
