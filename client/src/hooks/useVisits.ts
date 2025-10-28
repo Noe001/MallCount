@@ -15,10 +15,54 @@ export function useVisits() {
     mutationFn: async (mallId: number) => {
       return await apiRequest("POST", "/api/visits/increment", { mallId });
     },
+    onMutate: async (mallId: number) => {
+      // キャンセル進行中のクエリ
+      await queryClient.cancelQueries({ queryKey: ["/api/visits"] });
+
+      // 以前のデータを取得
+      const previousVisits = queryClient.getQueryData<Visit[]>(["/api/visits"]);
+
+      // 楽観的更新
+      if (previousVisits) {
+        const existingVisit = previousVisits.find(v => v.mallId === mallId);
+        if (existingVisit) {
+          // 既存の訪問記録を更新
+          queryClient.setQueryData<Visit[]>(["/api/visits"],
+            previousVisits.map(v =>
+              v.mallId === mallId
+                ? { ...v, visitCount: v.visitCount + 1, lastVisitedAt: new Date() }
+                : v
+            )
+          );
+        } else {
+          // 新しい訪問記録を追加
+          queryClient.setQueryData<Visit[]>(["/api/visits"], [
+            ...previousVisits,
+            {
+              id: Date.now(), // 一時的なID
+              mallId,
+              userId: '', // 一時的な値
+              visitCount: 1,
+              lastVisitedAt: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            }
+          ]);
+        }
+      }
+
+      return { previousVisits };
+    },
     onSuccess: () => {
+      // サーバーから最新データを取得
       queryClient.invalidateQueries({ queryKey: ["/api/visits"] });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _mallId, context) => {
+      // エラー時は以前のデータに戻す
+      if (context?.previousVisits) {
+        queryClient.setQueryData(["/api/visits"], context.previousVisits);
+      }
+
       if (isUnauthorizedError(error)) {
         toast({
           title: "未認証",
@@ -42,10 +86,36 @@ export function useVisits() {
     mutationFn: async (mallId: number) => {
       return await apiRequest("POST", "/api/visits/decrement", { mallId });
     },
+    onMutate: async (mallId: number) => {
+      // キャンセル進行中のクエリ
+      await queryClient.cancelQueries({ queryKey: ["/api/visits"] });
+
+      // 以前のデータを取得
+      const previousVisits = queryClient.getQueryData<Visit[]>(["/api/visits"]);
+
+      // 楽観的更新
+      if (previousVisits) {
+        queryClient.setQueryData<Visit[]>(["/api/visits"],
+          previousVisits.map(v =>
+            v.mallId === mallId && v.visitCount > 0
+              ? { ...v, visitCount: v.visitCount - 1, lastVisitedAt: new Date() }
+              : v
+          ).filter(v => v.visitCount > 0) // カウントが0になったら削除
+        );
+      }
+
+      return { previousVisits };
+    },
     onSuccess: () => {
+      // サーバーから最新データを取得
       queryClient.invalidateQueries({ queryKey: ["/api/visits"] });
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _mallId, context) => {
+      // エラー時は以前のデータに戻す
+      if (context?.previousVisits) {
+        queryClient.setQueryData(["/api/visits"], context.previousVisits);
+      }
+
       if (isUnauthorizedError(error)) {
         toast({
           title: "未認証",
